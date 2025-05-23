@@ -20,31 +20,8 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
-int input = 10; // Logic gate and NOT gate
-bool loop(){
-	if(input / 10 == 1){	// is a logic gate
 
-		// figure out how to not hard-code this when it's not 1AM
-		switch (input % 10) {
-		case 0 : { NOT_Gate gate;
-				return gate.check(); }
-		case 1 : { AND_Gate gate;
-				return gate.check(); }
-		case 2 : { OR_Gate gate;
-				return gate.check(); }
-		case 3 : { NAND_Gate gate;
-				return gate.check(); }
-		case 4 : { NOR_Gate gate;
-				return gate.check(); }
-		case 5 : { XOR_Gate gate;
-				return gate.check(); }
-		default : { std::cout << "No chip was found." << std::endl;
-				return false; }
-		}
-	}
-	return false;	// just because why not
-}
-
+/* Driver Code */
 int main(void){
 	// Initializations
 	HAL_Init(); // Reset all peripherals
@@ -52,13 +29,37 @@ int main(void){
 	MX_GPIO_Init();	//Initialize GPIO pins
   	MX_USART2_UART_Init(); // Initialize UART
 
-  	while(1){
-  		if(loop()) {
-  			std::cout << "Your chip works properly!" << std::endl;
-  			break;
-  		} else {
-  			std::cout << "Your chip does not work :(" << std::endl;
-  			break;
+  	// initialize used function and input
+  	int16_t input = 11;	// hard-coded input for now
+  	auto getGateType = [&input](){ return input % 10; };	// lambda
+  	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+  	HAL_Delay(10);
+
+  	// Create an array of object pointers
+  	LogicGate *all_gates[int16_t(GateType::LAST) + 1] = {new NOT_Gate(), new AND_Gate(), new OR_Gate(), new NAND_Gate(), new NOR_Gate(), new XOR_Gate()};
+
+  	auto gateIndex = getGateType();
+  	auto *gate = all_gates[gateIndex];
+  	bool result = true;
+  	result = gate->check();
+
+  	// delete created variables
+  	for (LogicGate *g : all_gates) {
+  		delete g;
+  	}
+
+  	if(result) {
+  		while(1) {
+  			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+  	  	  	HAL_Delay(510);
+
+  	  	  	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+  	  	  	HAL_Delay(510);
+  	  	  	}
+  	} else {
+  		while(1) {
+
+  			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
   		}
   	}
 
@@ -160,6 +161,21 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+  // Add this in MX_GPIO_Init()
+
+
+  // Configure PB4 and PB6 as OUTPUTS (STM32 driving logic gate inputs)
+  GPIO_InitStruct.Pin = GPIO_PIN_4 | GPIO_PIN_6;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  // Configure PB5 as INPUT (STM32 reading logic gate output)
+  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
