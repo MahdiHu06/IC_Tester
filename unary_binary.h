@@ -86,10 +86,10 @@ protected:
 		// iterate through the possible results
 		for (int16_t m_pos1 : m_values) {
 			for(int16_t m_pos2 : m_values) {
-				bool actual = test(m_pos1, m_pos2);
+				bool actualResult = test(m_pos1, m_pos2);
 				bool expectedResult = expected(m_pos1 == 1, m_pos2 == 1);
 
-				result &= (expectedResult == actual);
+				result &= (actualResult == expectedResult);
 			}
 		}
 
