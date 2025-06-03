@@ -1,7 +1,8 @@
 
 /* Includes ------------------------------------------------------------------*/
+#include "ternary.h"
+#include "unary_binary.h"
 #include "main.h"
-#include "Chip_Classes.h"
 
 /* Private includes ----------------------------------------------------------*/
 
@@ -35,34 +36,61 @@ int main(void){
   	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
   	HAL_Delay(10);
 
-  	// Create an array of object pointers
-  	LogicGate *all_gates[int16_t(GateType::LAST) + 1] = {new NOT_Gate(), new AND_Gate(), new OR_Gate(), new NAND_Gate(), new NOR_Gate(), new XOR_Gate()};
+  	/* 1 and 2 input gates */
+  	if(input / 10 == 1) {
+		// Create an array of object pointers
+		LogicGate *all_gates[int16_t(GateType::LAST) + 1] = {new NOT_Gate(), new AND_Gate(), new OR_Gate(), new NAND_Gate(), new NOR_Gate(), new XOR_Gate()};
 
-  	auto gateIndex = getGateType();
-  	auto *gate = all_gates[gateIndex];
-  	bool result = true;
-  	result = gate->check();
+		auto gateIndex = getGateType();
+		auto *gate = all_gates[gateIndex];
+		bool result = gate->check();
 
-  	// delete created variables
-  	for (LogicGate *g : all_gates) {
-  		delete g;
+		// delete created variables
+		for (LogicGate *g : all_gates) { delete g; }
+
+		if(result) {
+			while(1) {
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+				HAL_Delay(510);
+
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+				HAL_Delay(510);
+				}
+		} else {
+			while(1) {
+
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+			}
+		}
   	}
 
-  	if(result) {
-  		while(1) {
-  			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-  	  	  	HAL_Delay(510);
+  	/* Now for 3 input gates */
+  	else if (input / 10 == 2) {
+  		LogicGate *all_gates[int16_t(GateType::LAST) + 1] = {new Ternary_AND(), new Ternary_OR(), new Ternary_NAND(), new Ternary_NOR(), new Ternary_XOR()};
+  		auto gateIndex = getGateType;
+  		auto *gate = all_gates[--gateIndex];
+  		bool result = gate->check();
 
-  	  	  	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-  	  	  	HAL_Delay(510);
-  	  	  	}
-  	} else {
-  		while(1) {
+  		for(LogicGate *g : all_gates) { delete g; }
 
-  			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-  		}
+  		if(result) {
+  			while(1) {
+  				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+  				HAL_Delay(510);
+
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+				HAL_Delay(510);
+				}
+		} else {
+			while(1) {
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+			}
+		}
   	}
+  	/* Now for 4 input gates */
+  	else if (input / 10 == 3) {
 
+  	}
   	return 0;
 }
 
