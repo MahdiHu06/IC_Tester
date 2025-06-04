@@ -11,9 +11,6 @@ protected:
 		: m_port(p_port), m_input(p_input), m_output1(p_output1), m_output2(p_output2), m_output3(p_output3)
 		{ }
 
-	// function to test against
-	virtual bool expected(bool b1, bool b2, bool b3) = 0;
-
 	// check function
 	bool check() override {
 		bool result = true;
@@ -66,7 +63,9 @@ private:
 
 class Ternary_AND : public TernaryGate {
 public:
-	Ternary_AND() { } // needs to be filled in
+	// Constructor
+	Ternary_AND() : TernaryGate(GPIOB, GPIO_PIN_5, GPIO_PIN_6, GPIO_PIN_7, GPIO_PIN_8)
+	{ }
 
 	// set up the expected function
 	virtual bool expected(bool b1, bool b2, bool b3) override { return (b1 && b2 && b3); }	// override original definition of = 0.
@@ -75,7 +74,9 @@ public:
 
 class Ternary_OR : public TernaryGate {
 public:
-	Ternary_OR() { } // needs to be filled in
+	// Constructor
+	Ternary_OR() : TernaryGate(GPIOB, GPIO_PIN_5, GPIO_PIN_6, GPIO_PIN_7, GPIO_PIN_8)
+	{ }
 
 	// set up the expected function
 	virtual bool expected(bool b1, bool b2, bool b3) override { return (b1 || b2 || b3); }
@@ -83,7 +84,9 @@ public:
 
 class Ternary_NAND : public TernaryGate {
 public:
-	Ternary_NAND() { } // needs to be filled in
+	// Constructor
+	Ternary_NAND() : TernaryGate(GPIOB, GPIO_PIN_5, GPIO_PIN_6, GPIO_PIN_7, GPIO_PIN_8)
+	{ }
 
 	// set up expected function
 	virtual bool expected(bool b1, bool b2, bool b3) override { return !(b1 && b2 && b3); }
@@ -91,7 +94,9 @@ public:
 
 class Ternary_NOR : public TernaryGate {
 public:
-	Ternary_NOR() { } // needs to be filled in
+	// Constructor
+	Ternary_NOR() : TernaryGate(GPIOB, GPIO_PIN_5, GPIO_PIN_6, GPIO_PIN_7, GPIO_PIN_8)
+	{ }
 
 	// set up expected function
 	virtual bool expected(bool b1, bool b2, bool b3) override { return !(b1 || b2 || b3); }
@@ -99,7 +104,9 @@ public:
 
 class Ternary_XOR : public TernaryGate {
 public:
-	Ternary_XOR() { } // needs to be filled in
+	// Constructor
+	Ternary_XOR() : TernaryGate(GPIOB, GPIO_PIN_5, GPIO_PIN_6, GPIO_PIN_7, GPIO_PIN_8)
+	{ }
 
 	// set up expected function
 	virtual bool expected(bool b1, bool b2, bool b3) override { return (b1 ^ b2 ^ b3); }
