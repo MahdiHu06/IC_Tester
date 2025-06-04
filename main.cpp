@@ -1,5 +1,6 @@
 
 /* Includes ------------------------------------------------------------------*/
+#include "quaternary.h"
 #include "ternary.h"
 #include "unary_binary.h"
 #include "main.h"
@@ -67,8 +68,8 @@ int main(void){
   	/* Now for 3 input gates */
   	else if (input / 10 == 2) {
   		LogicGate *all_gates[int16_t(GateType::LAST) + 1] = {new Ternary_AND(), new Ternary_OR(), new Ternary_NAND(), new Ternary_NOR(), new Ternary_XOR()};
-  		auto gateIndex = getGateType;
-  		auto *gate = all_gates[--gateIndex];
+  		auto gateIndex = getGateType() - 1;
+  		auto *gate = all_gates[gateIndex];
   		bool result = gate->check();
 
   		for(LogicGate *g : all_gates) { delete g; }
@@ -89,7 +90,26 @@ int main(void){
   	}
   	/* Now for 4 input gates */
   	else if (input / 10 == 3) {
+  		LogicGate *all_gates[int16_t(GateType::LAST) + 1] = {new quaternary_AND(), new quaternary_OR(), new quaternary_NAND, new quaternary_NOR(), new quaternary_XOR()};
+  		auto gateIndex = getGateType() - 1;
+  		auto *gate = all_gates[gateIndex];
+  		bool result = gate->check();
 
+  		for (LogicGate *g : all__gates) { delete g; }
+
+  		if(result) {
+  			while(1) {
+  				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+  		  		HAL_Delay(510);
+
+  		  		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+  				HAL_Delay(510);
+  		  	}
+  		} else {
+  			while(1) {
+  				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+  			}
+  		}
   	}
   	return 0;
 }
