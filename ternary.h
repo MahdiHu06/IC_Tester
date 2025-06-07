@@ -8,8 +8,8 @@ class TernaryGate : public LogicGate
 {
 protected:
 	TernaryGate(GPIO_TypeDef *p_port, int16_t p_input, int16_t p_output1, int16_t p_output2, int16_t p_output3)
-		: m_port(p_port), m_input(p_input), m_output1(p_output1), m_output2(p_output2), m_output3(p_output3)
-		{ }
+	    : m_port(p_port), m_input(p_input), m_output1(p_output1), m_output2(p_output2), m_output3(p_output3)
+	{ }
 
 	// check function
 	bool check() override {
