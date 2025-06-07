@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter.font import *
 from serial import *
-
+import time
 class Button:
     #initializations
 
@@ -72,15 +72,19 @@ def createWindow(p_chipX, p_chipY, p_inputX, p_inputY):
 
     return m_root
 def testPressed(root, currGate, currInput, ser):
-    result = bytes(currGate.get() + currInput.get() - 1)
-    ser.write(result)
+    byte_val = currGate.get() + currInput.get() - 1
+    ser.write(bytes([byte_val]))
+    time.sleep(0.2)
+    print("YAY")
     root.destroy()
 
 def main():
     try:
-        ser = Serial('COM11', 9600)
-    except ValueError:
-        print("Error opening port")
+       ser = Serial('COM11', 38400, timeout=1)
+    except Exception as e:
+        print(f"Serial connection failed: {e}")
+        return
+
     # starting values of the chip and input columns
     chipX = 125
     chipY = 70
@@ -134,7 +138,6 @@ def main():
         if currInput.get():
             testButton.place(x=(chipX + 390), y=530)
             testButton.configure(font=optionFont)
-            print(currInput.get())
             
     # Begin creating buttons
     gates = ["NOT Gate", "AND Gate", "OR Gate", "NAND Gate", "NOR Gate", "XOR Gate"]    # all possible gates
