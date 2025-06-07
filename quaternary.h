@@ -6,7 +6,7 @@
 class quaternaryGate : public LogicGate
 {
 protected:
-	quaternaryGate (GPIO_TypeDef *m_port, int16_t m_input, int16_t m_output1, int16_t m_output2, int16_t m_output3, int16_t m_output4)
+	quaternaryGate(GPIO_TypeDef *p_port, int16_t p_input, int16_t p_output1, int16_t p_output2, int16_t p_output3, int16_t p_output4)
 	: m_port(p_port), m_input(p_input), m_output1(p_output1), m_output2(p_output2), m_output3(p_output3), m_output4(p_output4)
 	{ }
 
@@ -33,14 +33,14 @@ protected:
 	virtual bool expected(bool p_b1, bool p_b2, bool p_b3, bool p_b4) = 0;	// must be redefined later
 
 private:
-	GPIO_TypeDef *p_port;	// port being used (A, B, or C)
-	int16_t p_input;	// pin to read from
+	GPIO_TypeDef *m_port;	// port being used (A, B, or C)
+	int16_t m_input;	// pin to read from
 
 	// pins to output from during test
-	int16_t p_output1;
-	int16_t p_output2;
-	int16_t p_output3;
-	int16_t p_output4;
+	int16_t m_output1;
+	int16_t m_output2;
+	int16_t m_output3;
+	int16_t m_output4;
 
 	// testing function
 	bool test(bool p_b1, bool p_b2, bool p_b3, bool p_b4) {
