@@ -1,9 +1,18 @@
-
 /* Includes ------------------------------------------------------------------*/
+#define HAL_MODULE_ENABLED
+#define HAL_RCC_MODULE_ENABLED
+#define HAL_GPIO_MODULE_ENABLED
+#define HAL_UART_MODULE_ENABLED
+#define HAL_CORTEX_MODULE_ENABLED
+#include "stm32f3xx_hal.h"
+
+#include "stm32f3xx_hal_uart.h"
+#include "stm32f3xx_hal_conf.h"
+#include "main.h"
 #include "quaternary.h"
 #include "ternary.h"
 #include "unary_binary.h"
-#include "main.h"
+
 
 /* Private includes ----------------------------------------------------------*/
 
@@ -17,11 +26,18 @@
 UART_HandleTypeDef huart2;
 
 /* Private function prototypes -----------------------------------------------*/
-void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_USART2_UART_Init(void);
+
 
 /* Private user code ---------------------------------------------------------*/
+
+/* USER CODE BEGIN PV */
+uint8_t input;
+volatile bool resultReady = false;
+volatile bool result = false;
+/* USER CODE END PV */
+extern "C" void SystemClock_Config(void);
+extern "C" void MX_GPIO_Init(void);
+extern "C" void MX_USART2_UART_Init(void);
 
 /* Driver Code */
 int main(void){
@@ -30,87 +46,30 @@ int main(void){
 	SystemClock_Config(); // Configure the system clock
 	MX_GPIO_Init();	//Initialize GPIO pins
   	MX_USART2_UART_Init(); // Initialize UART
+  	HAL_UART_Receive_IT(&huart2, &input, 1);
 
-  	// initialize used function and input
-  	int16_t input = 11;	// hard-coded input for now
-  	auto getGateType = [&input](){ return input % 10; };	// lambda
-  	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-  	HAL_Delay(10);
+  	while (true) {
+  		if (resultReady) {
+  			resultReady = false;
+  			if(result) {
+  				size_t i = 0;
+  				while (i < 3) {
+  					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+  					HAL_Delay(510);
 
-  	/* 1 and 2 input gates */
-  	if(input / 10 == 1) {
-		// Create an array of object pointers
-		LogicGate *all_gates[int16_t(GateType::LAST) + 1] = {new NOT_Gate(), new AND_Gate(), new OR_Gate(), new NAND_Gate(), new NOR_Gate(), new XOR_Gate()};
-
-		auto gateIndex = getGateType();
-		auto *gate = all_gates[gateIndex];
-		bool result = gate->check();
-
-		// delete created variables
-		for (LogicGate *g : all_gates) { delete g; }
-
-		if(result) {
-			while(1) {
-				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-				HAL_Delay(510);
-
-				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-				HAL_Delay(510);
-				}
-		} else {
-			while(1) {
-
-				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-			}
-		}
-  	}
-
-  	/* Now for 3 input gates */
-  	else if (input / 10 == 2) {
-  		LogicGate *all_gates[int16_t(GateType::LAST) + 1] = {new Ternary_AND(), new Ternary_OR(), new Ternary_NAND(), new Ternary_NOR(), new Ternary_XOR()};
-  		auto gateIndex = getGateType() - 1;
-  		auto *gate = all_gates[gateIndex];
-  		bool result = gate->check();
-
-  		for(LogicGate *g : all_gates) { delete g; }
-
-  		if(result) {
-  			while(1) {
-  				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-  				HAL_Delay(510);
-
-				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-				HAL_Delay(510);
-				}
-		} else {
-			while(1) {
-				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-			}
-		}
-  	}
-  	/* Now for 4 input gates */
-  	else if (input / 10 == 3) {
-  		LogicGate *all_gates[int16_t(GateType::LAST) + 1] = {new quaternary_AND(), new quaternary_OR(), new quaternary_NAND, new quaternary_NOR(), new quaternary_XOR()};
-  		auto gateIndex = getGateType() - 1;
-  		auto *gate = all_gates[gateIndex];
-  		bool result = gate->check();
-
-  		for (LogicGate *g : all__gates) { delete g; }
-
-  		if(result) {
-  			while(1) {
-  				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-  		  		HAL_Delay(510);
-
-  		  		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-  				HAL_Delay(510);
-  		  	}
-  		} else {
-  			while(1) {
-  				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+  					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+  					HAL_Delay(510);
+  					// If it works. LED turns on and off
+  					i++;
+  				}
+  			} else {
+  				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);	// if it doesn't work. LED stays on
+  				HAL_Delay(5000);
+  				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
   			}
   		}
   	}
+
   	return 0;
 }
 
@@ -151,6 +110,7 @@ void SystemClock_Config(void)
   }
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2;
   PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
+
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
@@ -162,7 +122,7 @@ void SystemClock_Config(void)
   * @param None
   * @retval None
   */
-static void MX_USART2_UART_Init(void)
+void MX_USART2_UART_Init(void)
 {
 
   /* USER CODE BEGIN USART2_Init 0 */
@@ -170,6 +130,22 @@ static void MX_USART2_UART_Init(void)
   /* USER CODE END USART2_Init 0 */
 
   /* USER CODE BEGIN USART2_Init 1 */
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+	/* Enable GPIOA clock */
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+
+	/* USART2 TX (PA9) */
+	GPIO_InitStruct.Pin = GPIO_PIN_2 | GPIO_PIN_3;
+	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+
+	/* USART2 RX (PA10) */
+
 
   /* USER CODE END USART2_Init 1 */
   huart2.Instance = USART2;
@@ -186,6 +162,9 @@ static void MX_USART2_UART_Init(void)
   {
     Error_Handler();
   }
+  HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(USART2_IRQn);
+
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
@@ -197,10 +176,12 @@ static void MX_USART2_UART_Init(void)
   * @param None
   * @retval None
   */
-static void MX_GPIO_Init(void)
+void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   /* USER CODE BEGIN MX_GPIO_Init_1 */
+  // Missing in MX_GPIO_Init():
+
 
   /* USER CODE END MX_GPIO_Init_1 */
 
@@ -211,6 +192,12 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
   // Add this in MX_GPIO_Init()
 
+  GPIO_InitStruct.Pin = GPIO_PIN_2 | GPIO_PIN_3;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   // Configure PB4 and PB6 as OUTPUTS (STM32 driving logic gate inputs)
   GPIO_InitStruct.Pin = GPIO_PIN_4 | GPIO_PIN_6;
@@ -227,6 +214,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+
 
   /*Configure GPIO pin : B1_Pin */
   GPIO_InitStruct.Pin = B1_Pin;
@@ -247,6 +235,53 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+	// HAL_UART_Receive_IT(&huart2, &input, 1);
+	HAL_UART_Receive_IT(&huart2, &input, 1);
+	HAL_UART_Transmit(&huart2, &input, 1, 0xFFF);
+
+		auto gateVal = input;
+	auto getGateType = [gateVal](){return gateVal % 10; };	// get the type of gate
+	  	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+
+
+	  	if (input / 10 == 1 || input / 10 == 2) {
+	  		// Create an array of object pointers
+	  		LogicGate *all_gates[int16_t(GateType::LAST) + 1] = {new NOT_Gate(), new AND_Gate(), new OR_Gate(), new NAND_Gate(), new NOR_Gate(), new XOR_Gate()};
+
+	  		// Perform check
+	  		auto gateIndex = getGateType();
+	  		auto *gate = all_gates[gateIndex];
+	  		result = gate->check();
+
+	  		// delete created objects
+	  		for (LogicGate *g : all_gates) { delete g; }
+	  	} else if (input / 10 == 3) {
+	  		LogicGate *all_gates[int16_t(GateType::LAST) + 1] = {new Ternary_AND(), new Ternary_OR(), new Ternary_NAND(), new Ternary_NOR(), new Ternary_XOR()};
+
+	  		// Perform check
+	  		auto gateIndex = getGateType() - 1;
+	  		auto *gate = all_gates[gateIndex];
+	  		result = gate->check();
+
+	  		// delete objects
+	  		for (LogicGate *g : all_gates) { delete g; }
+	  	} else {
+	  		LogicGate *all_gates[int16_t(GateType::LAST) + 1] = {new quaternary_AND(), new quaternary_OR(), new quaternary_NAND(), new quaternary_NOR(), new quaternary_XOR()};
+
+	  		auto gateIndex = getGateType() - 1;
+	  		auto *gate = all_gates[gateIndex];
+	  		result = gate->check();
+
+	  		for (LogicGate *g : all_gates) { delete g; }
+	  	}
+	  	resultReady = true;
+
+}
+
+
+
 
 /* USER CODE END 4 */
 
