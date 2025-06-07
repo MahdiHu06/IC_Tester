@@ -86,17 +86,44 @@ def main():
     exit = Button(root, "Exit", 0, 20, 530, 0)
     exit.createExit(optionFont)
 
+    # gates and inputs
+    currGate = tk.IntVar(value=0)   # shared IntVar for all options
+    currInput = tk.IntVar(value=0)
+
+    # Individual buttons
+    singleInput = tk.Radiobutton(root, text="One Input", variable=currInput, value=1, font=optionFont)
+    doubleInput = tk.Radiobutton(root, text="Two Inputs", variable=currInput, value=2, font=optionFont)
+    ternaryInput = tk.Radiobutton(root, text="Three Inputs", variable=currInput, value=3, font=optionFont)
+    quadInput = tk.Radiobutton(root, text="Four Inputs", variable=currInput, value=4, font=optionFont)
+    inputButtons = [singleInput, doubleInput, ternaryInput, quadInput]
+    
+    # trace the gate
+    def gateTracer(*args):
+        for input in inputButtons:
+            input.place_forget() # hide
+        if(currGate.get() == 1):    # NOT gate
+            inputButtons[0].place(x=inputX, y=inputY)
+        elif(currGate.get() in [2, 3, 4, 5, 6]):
+            currButton = 0
+            newY = inputY
+            while currButton < 3:
+                inputButtons[currButton + 1].place(x=inputX, y=newY)
+                newY += 30
+                currButton += 1
+
+
     # Begin creating buttons
     gates = ["NOT Gate", "AND Gate", "OR Gate", "NAND Gate", "NOR Gate", "XOR Gate"]    # all possible gates
-    result = 0 # result of which gate is picked
-    
-    currSelected = tk.IntVar(value=0)   # shared IntVar for all options
+    currGate.trace_add("write", gateTracer)
+
+    # Create chip and input buttons
     for i, gate in enumerate(gates):
-        button = Button(root, gate, i + 1, chipX, chipY, currSelected)
+        button = Button(root, gate, i + 1, chipX, chipY, currGate)
         button.createButton(optionFont)
         chipY += 30
-
+    
     root.mainloop()
+    print(button.var.get())
     return 0
 if __name__ == '__main__':
     main()
