@@ -27,7 +27,7 @@ class LogicGate {
 public:
     // keep each check unique to respective gate
     virtual bool check() = 0;
-    virtual ~LogicGate() {}
+    virtual ~LogicGate() {} // destructor
 protected:
     int16_t m_values[2];    // possible values (0, 1)
     LogicGate() : m_values{ 0, 1 } {}
@@ -62,9 +62,8 @@ private:
 
     /* Test function */
     bool test(uint16_t p_pin) { // pin is expected pin
-        sio_hw->gpio_set = (p_pin == 1) ? m_output : sio_hw->gpio_set;
-        sio_hw->gpio_clr = (p_pin == 1) ? sio_hw->gpio_clr : m_output;
-        sleep_ms(10);
+        bool m_pinState = p_pin ? true : false;
+        gpio_put(m_output, m_pinState);
         
         return (gpio_get(m_input) != 0);  // 0 for low and non-zero for high
     }
