@@ -29,8 +29,8 @@ private:
     uint16_t m_output2;
 
     bool test(uint16_t p_pin1, uint16_t p_pin2) {
-        bool m_pinState1 = p_pin1 ? true : false;
-        bool m_pinState2 = p_pin2 ? true : false;
+        bool m_pinState1 = p_pin1 ? true : false;   // is first output on or off
+        bool m_pinState2 = p_pin2 ? true : false;   // is second output on or off
 
         gpio_put(m_output1, m_pinState1);
         sleep_ms(10);
@@ -39,7 +39,7 @@ private:
         sleep_ms(10);
 
         // check the input pin
-        return (gpio_get(m_input) != 0);
+        return (gpio_get(m_input) != 0);    // true if input is on, false if input is off
     }
 };
 

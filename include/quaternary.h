@@ -58,41 +58,41 @@ private:
     }
 };
 
-class QuaternaryAND : public QuaternaryGate {
+class Quaternary_AND : public QuaternaryGate {
 public:
-    QuaternaryAND() :
+    Quaternary_AND() :
     QuaternaryGate(INPUT_PIN, OUTPUT_PIN1, OUTPUT_PIN2, OUTPUT_PIN3, OUTPUT_PIN4)
     {}
     virtual bool expected(bool b1, bool b2, bool b3, bool b4) override { return (b1 && b2 && b3 && b4); }
 };
 
-class QuaternaryOR : public QuaternaryGate {
+class Quaternary_OR : public QuaternaryGate {
 public:
-    QuaternaryOR() :
+    Quaternary_OR() :
     QuaternaryGate(INPUT_PIN, OUTPUT_PIN1, OUTPUT_PIN2, OUTPUT_PIN3, OUTPUT_PIN4)
     {}
     virtual bool expected(bool b1, bool b2, bool b3, bool b4) override { return (b1 || b2 || b3 || b4); }
 };
 
-class QuaternaryNAND : public QuaternaryGate {
+class Quaternary_NAND : public QuaternaryGate {
 public:
-    QuaternaryNAND() :
+    Quaternary_NAND() :
     QuaternaryGate(INPUT_PIN, OUTPUT_PIN1, OUTPUT_PIN2, OUTPUT_PIN3, OUTPUT_PIN4)
     {}
     virtual bool expected(bool b1, bool b2, bool b3, bool b4) override { return (!(b1 && b2 && b3 && b4)); }
 };
 
-class QuaternaryNOR : public QuaternaryGate {
+class Quaternary_NOR : public QuaternaryGate {
 public:
-    QuaternaryNOR() :
+    Quaternary_NOR() :
     QuaternaryGate(INPUT_PIN, OUTPUT_PIN1, OUTPUT_PIN2, OUTPUT_PIN3, OUTPUT_PIN4)
     {}
     virtual bool expected(bool b1, bool b2, bool b3, bool b4) override { return (!(b1 || b2 || b3 || b4)); }
 };
 
-class QuaternaryXOR : public QuaternaryGate {
+class Quaternary_XOR : public QuaternaryGate {
 public:
-    QuaternaryXOR() :
+    Quaternary_XOR() :
     QuaternaryGate(INPUT_PIN, OUTPUT_PIN1, OUTPUT_PIN2, OUTPUT_PIN3, OUTPUT_PIN4)
     {}
     virtual bool expected(bool b1, bool b2, bool b3, bool b4) override { return (b1 ^ b2 ^ b3 ^ b4); }
