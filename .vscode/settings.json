@@ -1,0 +1,21 @@
+{
+    "cmake.ignoreCMakeListsMissing": true
+    // Let CMake feed include paths/defines to IntelliSense
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+
+    // Point to your ARM compiler (fix the path for your OS)
+    "C_Cpp.default.compilerPath": "/usr/bin/arm-none-eabi-gcc",
+    "C_Cpp.default.intelliSenseMode": "gcc-arm",
+    "C_Cpp.default.cppStandard": "c++17",
+
+    // Explicitly use the compile commands DB CMake just generated
+    "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
+
+    // Make the popups behave like your screenshot
+    "editor.hover.enabled": true,                 // show docs on hover
+    "editor.parameterHints.enabled": true,        // show params after '('
+    "editor.suggestOnTriggerCharacters": true,    // trigger on ., ->, ::, etc.
+    "C_Cpp.autocompleteAddParentheses": true,     // insert () on completion
+    "C_Cpp.intelliSenseEngine": "Default",
+    "C_Cpp.intelliSenseEngineFallback": "Disabled"
+}
