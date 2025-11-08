@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "pico/stdlib.h"
+#include "unary.h"
 using namespace std;
 
 /* Functions used in main.cpp */
